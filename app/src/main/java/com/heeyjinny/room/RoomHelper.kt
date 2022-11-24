@@ -28,4 +28,5 @@ abstract class RoomHelper: RoomDatabase() {
     //화면에 보여질 뷰 작성을 위해
     //activity_main.xml, item_recycler.xml 작성 후
     //어댑터 클래스 생성...RecyclerAdapter
+
 }
