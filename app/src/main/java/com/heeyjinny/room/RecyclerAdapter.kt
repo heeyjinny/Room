@@ -1,9 +1,9 @@
-package com.heeyjinny.sqlite
+package com.heeyjinny.room
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.heeyjinny.sqlite.databinding.ItemRecyclerBinding
+import com.heeyjinny.room.databinding.ItemRecyclerBinding
 import java.text.SimpleDateFormat
 
 //리사이클러뷰 어댑터를 상속받는 어댑터클래스 생성
@@ -15,10 +15,10 @@ class RecyclerAdapter: RecyclerView.Adapter<RecyclerAdapter.Holder>() {
     //8
     //데이터 삭제 구현을 위해 생성하는 helper프로퍼티 생성하고
     //Holder클래스에 클릭리스너 달기...
-    var helper: SqliteHelper? = null
+    var helper: RoomHelper? = null
 
     //3
-    var listData = mutableListOf<Memo>()
+    var listData = mutableListOf<RoomMemo>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         //4
@@ -30,7 +30,7 @@ class RecyclerAdapter: RecyclerView.Adapter<RecyclerAdapter.Holder>() {
     override fun onBindViewHolder(holder: Holder, position: Int) {
         //6
         val memo = listData.get(position)
-        holder.setMemo(memo)
+        holder.setRoomMemo(memo)
 
     }
 
@@ -49,18 +49,20 @@ class RecyclerAdapter: RecyclerView.Adapter<RecyclerAdapter.Holder>() {
 
         //11
         //홀더는 한 화면에 그려지는 개수만큼 만든 후 재사용함 그래서
-        //클릭하는 시점에 어떤 데이터가 있는지 알아야 하므로 변수 선언 후 setMemo()를 통해 넘어온 Memo임시 저장
-        var mMemo: Memo? = null
+        //클릭하는 시점에 어떤 데이터가 있는지 알아야 하므로 변수 선언 후 setRoomMemo()를 통해 넘어온 RoomMemo임시 저장
+        var mRoomMemo: RoomMemo? = null
 
         //9
         //삭제버튼을 누르면 반응하는 메서드 만들기
         init {
             binding.btnDelete.setOnClickListener {
                 //12
-                //SQLite의 데이터를 먼저 삭제하고 listData데이터도 삭제
-                //deleteMemo는 null을 허용하지 않지만 mMemo는 null허용설정이 되었기 때문에 !!강제함
-                helper?.deleteMemo(mMemo!!)
-                listData.remove(mMemo)
+                //roomMemo데이터를 먼저 삭제하고 listData데이터도 삭제
+                //mRoomMemo는 null허용설정이 되었기 때문에 !!강제함
+                //RoomHelper를 사용할 때 여러개의 Dao가 있을 수 있기 때문에
+                //헬퍼?.Dao()?.메서드() 형태로 가운데에 어떤 Dao를 쓸 건지 명시해야함
+                helper?.roomMemoDao()?.delete(mRoomMemo!!)
+                listData.remove(mRoomMemo)
 
                 //12-1
                 //어댑터 갱신
@@ -75,15 +77,15 @@ class RecyclerAdapter: RecyclerView.Adapter<RecyclerAdapter.Holder>() {
         //item_recycler.xml
 
         //5
-        fun setMemo(memo: Memo){
+        fun setRoomMemo(memo: RoomMemo){
             binding.textNum.text = "${memo.num}"
             binding.textContent.text = memo.content
             val sdf = SimpleDateFormat("yyyy/MM/dd hh:mm:ss")
             binding.textDateTime.text = sdf.format(memo.datetime).toString()
 
             //11-1
-            //setMemo()를 통해 넘어온 Memo임시 저장
-            this.mMemo = memo
+            //setRoomMemo()를 통해 넘어온 RoomMemo임시 저장
+            this.mRoomMemo = memo
 
         }
 
